@@ -4,4 +4,26 @@
 "title"		"deathmatch"
 "maps"		""
 "menusystem"	"1"
+
+	"settings"
+	{
+		1
+		{
+			"name"		"fi_grenades"
+			"text"		"Grenades"
+			"help"		"Should players have grenades?"
+			"type"		"CheckBox"
+			"default"	"1"
+		}
+
+		
+		2
+		{
+			"name"		"fi_shields"
+			"text"		"Shields"
+			"help"		"If enabled then shields are enabled"
+			"type"		"CheckBox"
+			"default"	"1"
+		}
+	}
 }
