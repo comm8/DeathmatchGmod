@@ -1,0 +1,7 @@
+"deathmatch"
+{
+"base"		"base"
+"title"		"deathmatch"
+"maps"		""
+"menusystem"	"1"
+}
