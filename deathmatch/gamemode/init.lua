@@ -6,6 +6,8 @@ include ("shared.lua")
 
 util.AddNetworkString("killsound")
 util.AddNetworkString("MapChange")
+util.AddNetworkString("addweaponhalo")
+util.AddNetworkString("removeweaponhalo")
 
 hook.Add("Initialize", "cahjec", function()
 --RunConsoleCommand("sv_tfa_cmenu" , "0")
@@ -402,7 +404,13 @@ function Playerdying(victim, attacker)
     ent:Spawn()
     ent:Activate()
     ent:GetPhysicsObject():SetVelocity(victim:GetVelocity() * 1.5)
-    hook.Run("updatedroppedguns", ent)
+    ent:SetReserveClipSize(droppedweapon:GetMaxClip1())
+    net.Start("addweaponhalo", false)
+    net.WriteEntity(ent)
+    local rf = RecipientFilter()
+    rf:AddAllPlayers()
+    net.Send(rf)
+
     end
 
     if attacker != victim && attacker:IsPlayer() == true then
@@ -413,7 +421,7 @@ function Playerdying(victim, attacker)
     local selectedkill = math.random(#killlist)
     PrintMessage(HUD_PRINTTALK, victim:Nick() .. " was " .. killlist[selectedkill] .. " by ".. attacker:Nick() .. " with the " .. attacker:GetActiveWeapon():GetPrintName())
 
-    local wep = attacker:GetActiveWeapon()
+    local wep = attacker:GetWeapon(attacker:GetNWString("primaryweaponname"))
     local ammotype = wep:GetPrimaryAmmoType()
     local clipsize = wep:GetMaxClip1()
 
@@ -535,8 +543,15 @@ end
 end
 
 if CurTime() > 900 * runmapvote then
-MapVote.Start(10, true, 5, "dm")
+MapVote.Start(15, true, 5, "dm")
 runmapvote = runmapvote + 1
+--[[local scoreboard = {}
+local playerlists = player.GetAll()
+for i=1, #rf do
+table.insert(scoreboard,playerlists[i]:GetNWInt("PlayerKills"))
+end
+table.sort(scoreboard, function(a, b) return a[2] > b[2] end)
+end]]
 --local randnum = math.random(#maplist)
  --randmap = maplist[randnum]
 --net.Start("MapChange")

@@ -12,7 +12,8 @@ function ENT:SetupDataTables()
 
 self:NetworkVar("Int",0,"ReserveAmmo")
 self:NetworkVar("Int",1,"ReserveAmmoType")
-self:NetworkVar("Int",2,"GunNum")
+self:NetworkVar("Int",3,"ReserveClipSize")
+self:NetworkVar("Int",4,"GunNum")
 self:NetworkVar("String",0,"GunName")
 
     

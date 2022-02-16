@@ -27,20 +27,28 @@ function ENT:Use(activator, caller)
     local playerammotype = self:GetReserveAmmoType()
 
 self:SetReserveAmmoType(activeweapon:GetPrimaryAmmoType())
+self:SetReserveClipSize(activeweapon:GetMaxClip1())
 
 self:SetReserveAmmo(activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1())
+if activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1() == 0 then
+    net.Start("removeweaponhalo", false)
+    net.WriteEntity(self)
+    local rf = RecipientFilter()
+    rf:AddAllPlayers()
+    net.Send(rf)
+    self:Remove()
+end
 
 activator:RemoveAmmo(activator:GetAmmoCount(activeweapon:GetPrimaryAmmoType()), activeweapon:GetPrimaryAmmoType())
 activator:StripWeapon(activeweapon:GetClass())
 activator:GiveAmmo(playerweaponammo, playerammotype, true)
+activator:Give(self:GetGunName(),true)
+activator:SelectWeapon(self:GetGunName())
 self:SetModel(activeweapon:GetWeaponWorldModel())
 self:PhysicsInit(SOLID_VPHYSICS)
 self:SetMoveType(MOVETYPE_VPHYSICS)
 self:SetSolid(SOLID_VPHYSICS)
-activator:Give(self:GetGunName(),true)
-activator:SelectWeapon(self:GetGunName())
 active = activator:GetActiveWeapon()
-
 activator:SetNWString("primaryweaponname", self:GetGunName())
 
 local gunnumber = self:GetGunNum()
