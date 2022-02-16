@@ -8,7 +8,6 @@ util.AddNetworkString("killsound")
 util.AddNetworkString("MapChange")
 util.AddNetworkString("addweaponhalo")
 util.AddNetworkString("removeweaponhalo")
-util.AddNetworkString("updaterounds")
 
 hook.Add("Initialize", "cahjec", function()
 --RunConsoleCommand("sv_tfa_cmenu" , "0")
@@ -189,203 +188,174 @@ gunlist = {
 "tfa_mwr_ak74u", -- weapon class 
 80, --damage % compared to original
 4, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_bos14", -- weapon class 
 110, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_d25s", -- weapon class 
 100, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_drag", -- weapon class 
 70, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_fang45", -- weapon class 
 100, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_g3", -- weapon class 
 100, --damage % compared to original
 4, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_g36c", -- weapon class 
 100, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_kam12", -- weapon class 
 90, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_lynx", -- weapon class 
 100, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_m1014", -- weapon class 
 60, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_m14", -- weapon class 
 90, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_m16a4", -- weapon class 
 100, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_m21", -- weapon class 
 100, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_m4a1", -- weapon class 
 100, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_mac10", -- weapon class 
 100, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_uzi", -- weapon class 
 100, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_mk8", -- weapon class 
 70, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_ranger", -- weapon class 
 110, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_vz61", -- weapon class 
 100, --damage % compared to original
 5, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_mp44", -- weapon class 
 90, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_w1200", -- weapon class 
 50, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_xmlar", -- weapon class 
 90, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_ins2_minimi", -- weapon class 
 50, --damage % compared to original
 1, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_ins2_warface_orsis_t5000", -- weapon class 
 100, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_m9", -- weapon class 
 150, --damage % compared to original
 3, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_ins2_rpg", -- weapon class 
 100, --damage % compared to original
 2, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_ins2_s&w_500", -- weapon class 
 75, --damage % compared to original
 1, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_rpd", -- weapon class 
 100, --damage % compared to original
 1, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 {
 "tfa_mwr_prokolot", -- weapon class 
 110, --damage % compared to original
 4, --firing speed % compared to original
-100, --spread % compared to original
 },
 
 }
@@ -405,10 +375,6 @@ end )
 function GM:PlayerInitialSpawn(player, transition)
     local rand = math.random(#randmodel)
     player:SetModel(randmodel[rand])
-
-    net.Start("updaterounds", false)
-    net.WriteDouble(runmapvote)
-    net.send(player)
 end
 
 
@@ -579,12 +545,6 @@ end
 if CurTime() > 900 * runmapvote then
 MapVote.Start(15, true, 5, "dm")
 runmapvote = runmapvote + 1
-net.Start("updaterounds", false)
-net.WriteDouble(runmapvote)
-local rf = RecipientFilter()
-rf:AddAllPlayers()
-net.send(rf)
-
 --[[local scoreboard = {}
 local playerlists = player.GetAll()
 for i=1, #rf do
