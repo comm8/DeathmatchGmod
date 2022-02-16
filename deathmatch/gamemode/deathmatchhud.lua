@@ -32,7 +32,7 @@ DeathmatchScoreBoard:SetDraggable(false)
 DeathmatchScoreBoard.Paint = function (self,w,h)
     surface.SetDrawColor(0, 0, 0, 120)
     surface.DrawRect(0, 0, w, h)
-    draw.SimpleText("Scoreboard" .. "       time elapsed: " .. math.Truncate(RealTime(), 0) , "Deathmatch_SB", w / 2, h * .015, Color( 255, 220, 50, 255 ), TEXT_ALIGN_CENTER)
+    draw.SimpleText("Scoreboard" .. "       time elapsed: " .. math.Truncate(RealTime() --[[- (roundtime * runmapvote)]], 0) , "Deathmatch_SB", w / 2, h * .015, Color( 255, 220, 50, 255 ), TEXT_ALIGN_CENTER)
 end
 local ypos = DeathmatchScoreBoard:GetTall() * .06
 for k, v in pairs(player.GetAll()) do

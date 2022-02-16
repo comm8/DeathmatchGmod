@@ -46,7 +46,7 @@ activator:SetNWString("primaryweaponname", self:GetGunName())
 local gunnumber = self:GetGunNum()
 self:SetGunNum(activator:GetNWInt("GunTableNum"))
 activator:SetNWInt("GunTableNum", gunnumber)
-PrintMessage(HUD_PRINTTALK, activator:GetNWInt("GunTableNum"))
+--PrintMessage(HUD_PRINTTALK, activator:GetNWInt("GunTableNum"))
 setattachments(activator)
 
 self:SetGunName(playerweaponname)

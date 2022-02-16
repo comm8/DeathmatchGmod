@@ -15,7 +15,9 @@ RunConsoleCommand("sv_tfa_recoil_mul_y", "0.5")
 RunConsoleCommand("sv_tfa_recoil_mul_p", "0.5")
 RunConsoleCommand("viewbob_multiplier", "0.3")
 secondaryweapon = "tfa_mwr_harpoon"
-runmapvote = false
+--secondaryweaponstats.Primary.Attacks["len"] = 200
+--secondaryweaponstats.Primary.ClipSize = 20
+runmapvote = 1
 shielddowntime = 5
 shieldtick = 1
     shieldcooldownplayer = {}
@@ -91,6 +93,95 @@ gunlist = {
 2, --firing speed % compared to original
 },
 
+--[[{
+"cw_ak47", -- weapon class 
+110, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_ak74u", -- weapon class 
+120, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_bullfrog", -- weapon class 
+70, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_diamatti", -- weapon class 
+120, --damage % compared to original
+2, --firing speed % compared to original
+},
+
+{
+"cw_dmr14", -- weapon class 
+110, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_ffar", -- weapon class 
+100, --damage % compared to original
+2, --firing speed % compared to original
+},
+
+{
+"cw_gallo", -- weapon class 
+90, --damage % compared to original
+2, --firing speed % compared to original
+},
+
+{
+"cw_groza", -- weapon class 
+110, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_hauer77", -- weapon class 
+110, --damage % compared to original
+2, --firing speed % compared to original
+},
+
+{
+"cw_krig6", -- weapon class 
+110, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_lc10", -- weapon class 
+110, --damage % compared to original
+2, --firing speed % compared to original
+},
+
+{
+"cw_m16", -- weapon class 
+90, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_mac10", -- weapon class 
+120, --damage % compared to original
+1, --firing speed % compared to original
+},
+
+{
+"cw_milano", -- weapon class 
+110, --damage % compared to original
+2, --firing speed % compared to original
+},
+
+{
+"cw_mp5", -- weapon class 
+100, --damage % compared to original
+2, --firing speed % compared to original
+},]]
 {
 "tfa_mwr_ak74u", -- weapon class 
 80, --damage % compared to original
@@ -147,7 +238,7 @@ gunlist = {
 
 {
 "tfa_mwr_m1014", -- weapon class 
-70, --damage % compared to original
+60, --damage % compared to original
 2, --firing speed % compared to original
 },
 
@@ -237,7 +328,7 @@ gunlist = {
 
 {
 "tfa_mwr_m9", -- weapon class 
-130, --damage % compared to original
+150, --damage % compared to original
 3, --firing speed % compared to original
 },
 
@@ -249,14 +340,14 @@ gunlist = {
 
 {
 "tfa_ins2_s&w_500", -- weapon class 
-80, --damage % compared to original
+75, --damage % compared to original
 1, --firing speed % compared to original
 },
 
 {
 "tfa_mwr_rpd", -- weapon class 
 100, --damage % compared to original
-2, --firing speed % compared to original
+1, --firing speed % compared to original
 },
 
 {
@@ -301,17 +392,17 @@ function Playerdying(victim, attacker)
     local ent = ents.Create("dropped_weapon")
     local droppedweapon = victim:GetWeapon(victim:GetNWString("primaryweaponname"))
     droppedammotype = droppedweapon:GetPrimaryAmmoType()
-    ent:SetModel(droppedweapon:GetWeaponWorldModel())
     if victim:GetAmmoCount(droppedammotype) != nil && victim:GetAmmoCount(droppedammotype) + droppedweapon:Clip1() > 0 then
+    ent:SetModel(droppedweapon:GetWeaponWorldModel())
     ent:SetReserveAmmo(victim:GetAmmoCount(droppedammotype) + droppedweapon:Clip1())
     ent:SetReserveAmmoType(droppedammotype)
     ent:SetGunName(droppedweapon:GetClass())
     ent:SetGunNum(victim:GetNWInt("GunTableNum"))
-
     ent:SetPos((victim:GetPos() + (victim:GetUp() * 30)))
     ent:Spawn()
     ent:Activate()
     ent:GetPhysicsObject():SetVelocity(victim:GetVelocity() * 1.5)
+    hook.Run("updatedroppedguns", ent)
     end
 
     if attacker != victim && attacker:IsPlayer() == true then
@@ -320,6 +411,7 @@ function Playerdying(victim, attacker)
     attacker:SetNWInt("PlayerKills", attacker:GetNWInt("PlayerKills") + 1)
     print(attacker:GetNWInt("PlayerKills"))
     local selectedkill = math.random(#killlist)
+    PrintMessage(HUD_PRINTTALK, victim:Nick() .. " was " .. killlist[selectedkill] .. " by ".. attacker:Nick() .. " with the " .. attacker:GetActiveWeapon():GetPrintName())
 
     local wep = attacker:GetActiveWeapon()
     local ammotype = wep:GetPrimaryAmmoType()
@@ -435,16 +527,16 @@ if shieldplayer == nil then
 return
 end
 if shieldregenplayer != nil && shieldplayer:Armor() < shieldplayer:GetMaxArmor() && shieldplayer:GetNWInt("healthtick") < CurTime() then
-shieldplayer:SetArmor(shieldplayer:Armor() + 2)
+shieldplayer:SetArmor(shieldplayer:Armor() + 1)
 shieldplayer:SetNWInt("healthtick", CurTime() + shieldtick)
 elseif shieldplayer:Armor() >= shieldplayer:GetMaxArmor() then
 table.remove(shieldregenplayer, i)
 end
 end
 
-if CurTime() > 600 && runmapvote == false then
-MapVote.Start(10, true, 5,"wal_" + "gm_" + "dm_")
-runmapvote = true
+if CurTime() > 900 * runmapvote then
+MapVote.Start(10, true, 5, "dm")
+runmapvote = runmapvote + 1
 --local randnum = math.random(#maplist)
  --randmap = maplist[randnum]
 --net.Start("MapChange")
