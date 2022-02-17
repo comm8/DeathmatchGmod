@@ -231,14 +231,6 @@ gunlist = {
 
 
 {
-["name"] = "tfa_mwr_m16a4", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
 ["name"] = "tfa_mwr_m21", -- weapon class 
 ["dmgp"] = 100, --damage % compared to original
 ["clp"] = 2, --amount of extra clips
@@ -385,6 +377,14 @@ gunlist = {
 ["sprp"] = 100, --spread % compared to original
 },
 
+
+{
+["name"] = "tfa_ins2_ksg", -- weapon class 
+["dmgp"] = 20, --damage % compared to original
+["clp"] = 3, --amount of extra clips
+["sprp"] = 100, --spread % compared to original
+},
+
 }
 
 --were going to change the core weapon values for the server now so the weapons are correctly balanced
@@ -425,87 +425,12 @@ end
 end)
 
 function GM:PlayerInitialSpawn(player, transition)
-    player:AllowFlashlight(true)
     local rand = math.random(#randmodel)
     player:SetModel(randmodel[rand])
-
-    net.Start("updaterounds", false)
-    net.WriteDouble(runmapvote)
-    net.Send(player)
-    end
-
-
-
-
-
-function GM:PlayerSpawn(ply)
-    ply:SetupHands()
-    local randgun
-    local randomnum
-    randomnum = math.random(#gunlist)
-    randguntemp = gunlist[randomnum]
-    randgun = randguntemp["name"]
-    
-
-    ply:SetGravity(.80)
-    ply:SetMaxHealth(100)
-    ply:SetArmor(100)
-    ply:SetRunSpeed(320)
-    ply:SetWalkSpeed(200)
-    ply:SetCrouchedWalkSpeed(100)
-
-    ply:Give(randgun, false )
-    ply:SetNWString("primaryweaponname", randgun)
-    PrintMessage(HUD_PRINTTALK, randgun)
-    ply:Give(secondaryweapon)
-    local secondary = ply:GetWeapon(secondaryweapon)
-    if(GetConVar("fi_grenades"):GetBool() == true) then
-    ply:Give("weapon_frag")
-end
-
-end
-
--- Choose the model for hands according to their player model.
-function GM:PlayerSetHandsModel( ply, ent )
-
-	local simplemodel = player_manager.TranslateToPlayerModelName( ply:GetModel() )
-	local info = player_manager.TranslatePlayerHands( simplemodel )
-	if ( info ) then
-		ent:SetModel( info.model )
-		ent:SetSkin( info.skin )
-		ent:SetBodyGroups( info.body )
-	end
-
 end
 
 
 
-
---[[function Applyweaponstats(weapon, weaponid)
-
-local temporaryweaponvalues = gunlist[weaponid]
-
-if temporaryweaponvalues["dmgp"] != nil then
-weapon.Primary_TFA.Damage = weapon.Primary_TFA.Damage * (temporaryweaponvalues["dmgp"] / 100)
-weapon:ClearStatCache("Primary.Damage")
-end
-
-if temporaryweaponvalues["clp"] != nil then
-weapon.Primary_TFA.DefaultClip = weapon.Primary_TFA.ClipSize * temporaryweaponvalues["clp"]
-weapon:ClearStatCache("Primary.ClipSize")
-end
-
-if temporaryweaponvalues["sprp"] != nil then
-weapon.Primary_TFA.SpreadMultiplierMax = temporaryweaponvalues["sprp"] * weapon.Primary_TFA.SpreadMultiplierMax
-weapon:ClearStatCache("Primary.SpreadMultiplierMax")
-
-end
-
-
-end]]
-
-
---doing map cleanup to remove unwanted map items
 function GM:InitPostEntity()
     for i=1, #banneditems do
     local currentgroup = ents.FindByClass(banneditems[i])
@@ -517,31 +442,23 @@ function GM:InitPostEntity()
     end
 end
 
-
-
 function Playerdying(victim, attacker)
-
-PrintMessage(HUD_PRINTTALK, victim:GetNWString("primaryweaponname"))
-    local newdroppedweapon = ents.Create("dropped_weapon")
-
---gets the weapon with accompanying name on dead player
+    local ent = ents.Create("dropped_weapon")
     local droppedweapon = victim:GetWeapon(victim:GetNWString("primaryweaponname"))
-
-
     droppedammotype = droppedweapon:GetPrimaryAmmoType()
-
-
     if victim:GetAmmoCount(droppedammotype) != nil && victim:GetAmmoCount(droppedammotype) + droppedweapon:Clip1() > 0 then
-
-    newdroppedweapon:SetReserveAmmo( victim:GetAmmoCount(droppedammotype) + droppedweapon:Clip1() )
-    newdroppedweapon:SetReserveAmmoType(droppedammotype)
-    newdroppedweapon:SetGunName(droppedweapon:GetClass())
-    newdroppedweapon:SetPos((victim:GetPos() + (victim:GetUp() * 30)))
-    newdroppedweapon:Spawn()
-    newdroppedweapon:Activate()
-    newdroppedweapon:GetPhysicsObject():SetVelocity(victim:GetVelocity() * 1.5)
+    ent:SetModel(droppedweapon:GetWeaponWorldModel())
+    ent:SetReserveAmmo(victim:GetAmmoCount(droppedammotype) + droppedweapon:Clip1())
+    ent:SetReserveAmmoType(droppedammotype)
+    ent:SetGunName(droppedweapon:GetClass())
+    ent:SetGunNum(victim:GetNWInt("GunTableNum"))
+    ent:SetPos((victim:GetPos() + (victim:GetUp() * 30)))
+    ent:Spawn()
+    ent:Activate()
+    ent:GetPhysicsObject():SetVelocity(victim:GetVelocity() * 1.5)
+    ent:SetReserveClipSize(droppedweapon:GetMaxClip1())
     net.Start("addweaponhalo", false)
-    net.WriteEntity(newdroppedweapon)
+    net.WriteEntity(ent)
     local rf = RecipientFilter()
     rf:AddAllPlayers()
     net.Send(rf)
@@ -562,7 +479,6 @@ PrintMessage(HUD_PRINTTALK, victim:GetNWString("primaryweaponname"))
 
     attacker:GiveAmmo(clipsize,ammotype,true)
     --inflictor:SetArmor (inflictor:Armor() + 1)
-    
 else
 
     PrintMessage(HUD_PRINTTALK, victim:Nick() .. " took the easy way out")
@@ -573,55 +489,113 @@ end
 hook.Add("DoPlayerDeath", "theplayerfuccingdied", Playerdying)
 
 
+function GM:PlayerSpawn(ply)
+    randomnum = math.random(#gunlist)
+    randguntemp = gunlist[randomnum]
+    randgun = randguntemp["name"]
+
+
+ply:SetGravity(.80)
+ply:SetMaxHealth(100)
+ply:SetArmor(100)
+ply:SetRunSpeed(320)
+ply:SetWalkSpeed(200)
+ply:SetCrouchedWalkSpeed(100)
+ply:Give(randgun, false )
+PrintMessage(HUD_PRINTTALK, randgun .. " was not found!")
+activegun = ply:GetActiveWeapon()
+activegun.Attachments = randguntemp[4]
+ply:SetNWString("primaryweaponname", randgun)
+    --PrintMessage(HUD_PRINTTALK, randgun)
+ply:SetNWInt("GunTableNum", randomnum)
+ply:Give(secondaryweapon)
+ply:Give("weapon_frag")
+    --PrintMessage(HUD_PRINTTALK, util.TableToJSON(activegun.Attachments))
+    --PrintMessage(HUD_PRINTTALK, ply:GetNWInt("GunTableNum"))
+        local rand = math.random(#randmodel)
+    ply:SetModel(randmodel[rand])
+    ply:SetupHands()
+end
+
+
+mapselect = {
+
+}
 
 hook.Add("EntityTakeDamage", "afergrth", function(entity, dmg)
 if entity:IsPlayer() == true then
     entity:SetNWInt("damagetime", CurTime())
     shieldcooldownplayer[#shieldcooldownplayer + 1] = entity
+for i=1, #shieldregenplayer do 
+if IsValid(shieldregenplayer[i]) then
+table.remove(shieldregenplayer, i)
 end
-
+end
+end
 end)
 
+function setattachments(ply)
 
+local gunstats = gunlist[ply:GetNWInt("GunTableNum")]
+--ply:GetActiveWeapon().Attachments = gunstats[4]
+
+--[[local currentweapon = ply:GetActiveWeapon()
+local currentweaponclass = currentweapon:GetClass()
+
+	for k, v in pairs(currentweapon.Attachments) do
+		timer.Simple(0.1, function()
+			if currentweapon.Attachments[k] then
+				currentweapon:Attach()
+			end
+		end)
+	end
+
+    ply:GetActiveWeapon():Attach("cod_scope_acog")
+
+    PrintMessage(HUD_PRINTTALK, util.TableToJSON(ply:GetActiveWeapon().Attachments))]]
+end
 
 function GM:Think()
-    for i=1, #shieldcooldownplayer do
-        if CurTime() > shieldcooldownplayer[i]:GetNWInt("damagetime") + shielddowntime then
-            local player = shieldcooldownplayer[i]
-            player:SetNWInt("healthtick", CurTime() + shieldtick)
-            table.remove(shieldcooldownplayer, i)
-            shieldregenplayer[#shieldregenplayer + 1] = player
-            return
-        end
-    end
+--playerlist = player.GetAll()
+for i=1, #shieldcooldownplayer do
+if CurTime() > shieldcooldownplayer[i]:GetNWInt("damagetime") + shielddowntime then
+local player = shieldcooldownplayer[i]
+player:SetNWInt("healthtick", CurTime() + shieldtick)
+table.remove(shieldcooldownplayer, i)
+shieldregenplayer[#shieldregenplayer + 1] = player
 
-    for i=1, #shieldregenplayer do
-        local shieldplayer = shieldregenplayer[i]
-        if shieldplayer == nil then
-        return
-    end
+return
+end
+end
+for i=1, #shieldregenplayer do
+local shieldplayer = shieldregenplayer[i]
+if shieldplayer == nil then
+return
+end
+if shieldregenplayer != nil && shieldplayer:Armor() < shieldplayer:GetMaxArmor() && shieldplayer:GetNWInt("healthtick") < CurTime() then
+shieldplayer:SetArmor(shieldplayer:Armor() + 1)
+shieldplayer:SetNWInt("healthtick", CurTime() + shieldtick)
+elseif shieldplayer:Armor() >= shieldplayer:GetMaxArmor() then
+table.remove(shieldregenplayer, i)
+end
+end
 
-        if shieldregenplayer != nil && shieldplayer:Armor() < shieldplayer:GetMaxArmor() && shieldplayer:GetNWInt("healthtick") < CurTime() then
-            shieldplayer:SetArmor(shieldplayer:Armor() + 1)
-            shieldplayer:SetNWInt("healthtick", CurTime() + shieldtick)
-        elseif shieldplayer:Armor() >= shieldplayer:GetMaxArmor() then
-            table.remove(shieldregenplayer, i)
-        end
-
-        if shieldplayer == nil then
-            table.remove( shieldregenplayer, i )
-        return
-        end
-    end
-
-        if CurTime() > 900 * runmapvote then
-        MapVote.Start(15, true, 5, "dm")
-        runmapvote = runmapvote + 1
-        net.Start("updaterounds", false)
-        net.WriteDouble(runmapvote)
-        local rf = RecipientFilter()
-        rf:AddAllPlayers()
-        net.send(rf)
-    end
+if CurTime() > 900 * runmapvote then
+MapVote.Start(15, true, 5, "dm")
+runmapvote = runmapvote + 1
+--[[local scoreboard = {}
+local playerlists = player.GetAll()
+for i=1, #rf do
+table.insert(scoreboard,playerlists[i]:GetNWInt("PlayerKills"))
+end
+table.sort(scoreboard, function(a, b) return a[2] > b[2] end)
+end]]
+--local randnum = math.random(#maplist)
+ --randmap = maplist[randnum]
+--net.Start("MapChange")
+--net.Send(player.GetAll())
+--RunConsoleCommand("map",randmap)
+--timer.Simple(15, game.LoadNextMap)
+end
  
 end

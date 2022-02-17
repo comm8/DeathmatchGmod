@@ -27,16 +27,15 @@ function ENT:Use(activator, caller)
     local playerammotype = self:GetReserveAmmoType()
 
 self:SetReserveAmmoType(activeweapon:GetPrimaryAmmoType())
-self:SetReserveAmmo(activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1())
+self:SetReserveClipSize(activeweapon:GetMaxClip1())
 
+self:SetReserveAmmo(activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1())
 if activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1() == 0 then
     net.Start("removeweaponhalo", false)
     net.WriteEntity(self)
-
     local rf = RecipientFilter()
     rf:AddAllPlayers()
     net.Send(rf)
-    
     self:Remove()
 end
 
@@ -52,10 +51,11 @@ self:SetSolid(SOLID_VPHYSICS)
 active = activator:GetActiveWeapon()
 activator:SetNWString("primaryweaponname", self:GetGunName())
 
-local Primaryweaponname = self:GetGunName()
-self:SetGunName(activator:GetNWString()("primaryweaponname"))
-activator:SetNWString("primaryweaponname", gunnname)
+local gunnumber = self:GetGunNum()
+self:SetGunNum(activator:GetNWInt("GunTableNum"))
+activator:SetNWInt("GunTableNum", gunnumber)
 --PrintMessage(HUD_PRINTTALK, activator:GetNWInt("GunTableNum"))
+setattachments(activator)
 
 self:SetGunName(playerweaponname)
 self:SetPos(activator:GetPos() + (activator:GetAngles():Forward() * 0) + (activator:GetAngles():Up() * 55))

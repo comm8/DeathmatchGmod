@@ -9,8 +9,13 @@ ENT.Instructions = "developer testing"
 --ENT.AdminSpawnable = false
 
 function ENT:SetupDataTables()
+
 self:NetworkVar("Int",0,"ReserveAmmo")
 self:NetworkVar("Int",1,"ReserveAmmoType")
-self:NetworkVar("String",0,"GunName")   
+self:NetworkVar("Int",3,"ReserveClipSize")
+self:NetworkVar("Int",4,"GunNum")
+self:NetworkVar("String",0,"GunName")
+
+    
 end
 
