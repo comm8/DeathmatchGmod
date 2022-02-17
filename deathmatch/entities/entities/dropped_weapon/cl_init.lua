@@ -1,5 +1,4 @@
 include("shared.lua")
---util.AddNetworkString("addweaponhalo")
 droppedweapontable = {}
 function ENT:Draw()
 self:DrawModel()
@@ -12,22 +11,17 @@ end
 tableofguns
 end]]
 
-net.Receive("addweaponhalo",function()
-local ent = net.ReadEntity()
+function updatedroppedguns(ent)
 table.insert(droppedweapontable, ent)
-end)
-
-net.Receive("removeweaponhalo",function()
-    local ent = net.ReadEntity()
-    table.RemoveByValue(droppedweapontable, ent)
-    end)
+end
 
 hook.Add("PreDrawHalos", "DrawFakeWeaponHalo", function()
 
-    for i=1, #droppedweapontable do
-    local temptable = {droppedweapontable[i]}
-	local gunhighlight = Color(255, (droppedweapontable[i]:GetReserveAmmo()/droppedweapontable[i]:GetReserveClipSize()) * 60, 0)
-			halo.Add(temptable, gunhighlight, 1, 1, 5, true)
-    end
+	local gunhighlight = Color(255, 0, 0)
+    --local gunbacklight = Color(255, 50, 50)
+	--local gunlist = {}
+    --gunlist = ents.FindByClass("dropped_weapon")
+			halo.Add(droppedweapontable, gunhighlight, 1, 1, 5, true)
+            --halo.Add(gunlist, gunbacklight, 10, 10, 2, true)
 
 end)
