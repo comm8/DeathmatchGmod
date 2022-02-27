@@ -1,7 +1,8 @@
 include ("shared.lua")
 include ("deathmatchhud.lua")
 
-local tab = {
+
+local fullhealth = {
 	[ "$pp_colour_addr" ] = 0.23,
 	[ "$pp_colour_addg" ] = 0.16,
 	[ "$pp_colour_addb" ] = 0.09,
@@ -12,6 +13,46 @@ local tab = {
 	[ "$pp_colour_mulg" ] = 0,
 	[ "$pp_colour_mulb" ] = 0
 }
+
+--[[purely to see original for development
+local lowhealth = {
+	[ "$pp_colour_addr" ] = 0.25,
+	[ "$pp_colour_addg" ] = 0.16,
+	[ "$pp_colour_addb" ] = 0.09,
+	[ "$pp_colour_brightness" ] = -0.4,
+	[ "$pp_colour_contrast" ] = 1.6,
+	[ "$pp_colour_colour" ] = 0.5,
+	[ "$pp_colour_mulr" ] = 0.7,
+	[ "$pp_colour_mulg" ] = 0,
+	[ "$pp_colour_mulb" ] = 0
+}
+]]
+
+
+local lowhealth = {
+	[ "$pp_colour_addr" ] = 0.04,
+	[ "$pp_colour_addg" ] = 0,
+	[ "$pp_colour_addb" ] = 0,
+	[ "$pp_colour_brightness" ] = -0.2,
+	[ "$pp_colour_contrast" ] = 0.5,
+	[ "$pp_colour_colour" ] = 0,
+	[ "$pp_colour_mulr" ] = 1,
+	[ "$pp_colour_mulg" ] = 0,
+	[ "$pp_colour_mulb" ] = 0
+}
+
+local finalhealth = {
+	[ "$pp_colour_addr" ] = 0.23,
+	[ "$pp_colour_addg" ] = 0.16,
+	[ "$pp_colour_addb" ] = 0.09,
+	[ "$pp_colour_brightness" ] = -0.2,
+	[ "$pp_colour_contrast" ] = 1.31,
+	[ "$pp_colour_colour" ] = 1,
+	[ "$pp_colour_mulr" ] = 1,
+	[ "$pp_colour_mulg" ] = 0,
+	[ "$pp_colour_mulb" ] = 0
+}
+
 function GM:SpawnMenuOpen()
     return false
 end
@@ -20,28 +61,44 @@ function GM:ContextMenuOpen()
     return false
 end
 
+
 hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
 
+ply = LocalPlayer()
+localdelta = ((1 - ply:Health()/ply:GetMaxHealth()))
 	DrawBloom( 0.5, 0.7, 9, 9, 5, 2, 0.41, 0.3, 0 )
-	DrawColorModify( tab )
-end )
+
+	--DrawBloom( 0.2, 0.4, 9, 9, 5, 2, 0.2, 0.6, 1 )
+
+	for k,v in pairs(finalhealth) do 
+	finalhealth[k] = fullhealth[k] + lowhealth[k] * localdelta
+	end
+	DrawColorModify( finalhealth )
+	
+end)
+
+net.Receive("updatehealth", function()
 
 
+
+
+
+end)
 
 net.Receive("addweaponhalo",function()
-local ent = net.ReadEntity()
+--[[local ent = net.ReadEntity()
 if ent.IsValid then
 table.insert(droppedweapontable, ent)
 PrintMessage(HUD_PRINTTALK, ent:GetReserveAmmo() .. "is the ammo count this weapon should have")
-end
+end]]
 end)
 
 net.Receive("removeweaponhalo",function()
-    local ent = net.ReadEntity()
-    table.RemoveByValue(droppedweapontable, ent)
+   --[[local ent = net.ReadEntity()
+    table.RemoveByValue(droppedweapontable, ent)]]
     end)
 
-hook.Add("PreDrawHalos", "DrawFakeWeaponHalo", function()
+--[[hook.Add("PreDrawHalos", "DrawFakeWeaponHalo", function()
 
     for i=1, #droppedweapontable do
     local temptable = {droppedweapontable[i]}
@@ -50,7 +107,7 @@ hook.Add("PreDrawHalos", "DrawFakeWeaponHalo", function()
 			halo.Add(temptable, gunhighlight, 1, 1, 5, true)
     end
     end
-end)
+end)]]
 
 
 

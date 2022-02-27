@@ -9,11 +9,24 @@ util.AddNetworkString("MapChange")
 util.AddNetworkString("addweaponhalo")
 util.AddNetworkString("removeweaponhalo")
 util.AddNetworkString("updaterounds")
+util.AddNetworkString("updatehealth")
 --add a bunch of network calls to let clients know whats going on
+
+--function SWEP:Attach(slot, att)
+--function SWEP:GetCurrentAttachment(slot)
+--function SWEP:GetCustomizationIndex(name)
 
 
 hook.Add("Initialize", "cahjec", function()
 --this is called when the server starts
+
+concommand.Add("cr_saveweapdata", function(ply, cmd, ags, str)
+
+SaveWeaponDataToJSON()
+
+
+end)
+
 
 concommand.Add( "cr_weapon", function( ply, cmd, args, str )
 --were creating a console command that we can use to replace weapons
@@ -33,7 +46,20 @@ ply:Give(curweaponstat["name"], false)
 end  
 end )
 
+
+concommand.Add("cr_getmwbaseattachments", function(ply, cmd, ags, str)
+
+ply:GetActiveWeapon():GetCustomizationIndex(name)
+    
+    
+    end)
+
 --Running some commands to get all the gun values right
+RunConsoleCommand("mgbase_sv_pvedamage", "0.2")
+RunConsoleCommand("mgbase_sv_recoil", "4")
+
+
+RunConsoleCommand("sv_tfa_damage_multiplier", "0.3")
 RunConsoleCommand("sv_tfa_recoil_mul_y", "0.5")
 RunConsoleCommand("sv_tfa_recoil_mul_p", "0.5")
 RunConsoleCommand("sv_tfa_spread_multiplier", "3")
@@ -50,7 +76,7 @@ shielddowntime = 5
 --how long armor is down for after taking damage before it starts going back up
 
 
-shieldtick = 1
+shieldtick = 0.5
 --how much time in seconds inbetween armor going up by 1
 
     shieldcooldownplayer = {}
@@ -124,268 +150,9 @@ shieldtick = 1
     "gm_quarantine"
                     }
 
-
-gunlist = {
-{
-["name"] = "tfa_mwr_ak47", -- weapon class 
---AK 47 
---A medium damage medium range weapon useful in most situations
-
-["dmgp"] = 110, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_ak74u", -- weapon class 
---AK 74u
---The close range variant of the AK 47
---useful because of its high magazine count
---lower damage from afar
-
-["dmgp"] = 80, --damage % compared to original
-["clp"] = 4, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_bos14", -- weapon class 
-["dmgp"] = 110, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_d25s", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_drag", -- weapon class 
-["dmgp"] = 70, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_fang45", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_g3", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 4, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_g36c", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_kam12", -- weapon class 
-["dmgp"] = 90, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_lynx", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_m1014", -- weapon class 
-["dmgp"] = 60, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_m14", -- weapon class 
-["dmgp"] = 90, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_m21", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_m4a1", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_mac10", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 3,--amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_uzi", -- weapon class 
-["dmgp"] = 95, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 20, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_mk8", -- weapon class 
-["dmgp"] = 70, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_ranger", -- weapon class 
-["dmgp"] = 110, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_vz61", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 5, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_mp44", -- weapon class 
-["dmgp"] = 90, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_w1200", -- weapon class 
-["dmgp"] = 50, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_xmlar", -- weapon class 
-["dmgp"] = 90, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_m9", -- weapon class 
-["dmgp"] = 150, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_rpd", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 1, --amount of extra clips
-["sprp"] = 200, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_mwr_prokolot", -- weapon class 
-["dmgp"] = 110, --damage % compared to original
-["clp"] = 4, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-
---everything below here is not from the MW weapons addons
-
-
-{
-["name"] = "tfa_ins2_minimi", -- weapon class 
-["dmgp"] = 50, --damage % compared to original
-["clp"] = 1, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_ins2_warface_orsis_t5000", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_iiopn_9mm_dual", -- weapon class 
-["dmgp"] = 110, --damage % compared to original
-["clp"] = 1, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_ins2_s&w_500", -- weapon class 
-["dmgp"] = 75, --damage % compared to original
-["clp"] = 1, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_ins2_rpg", -- weapon class 
-["dmgp"] = 100, --damage % compared to original
-["clp"] = 2, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-
-{
-["name"] = "tfa_ins2_ksg", -- weapon class 
-["dmgp"] = 20, --damage % compared to original
-["clp"] = 3, --amount of extra clips
-["sprp"] = 100, --spread % compared to original
-},
-
-}
+PrintMessage(HUD_PRINTTALK, GetConVar("fi_weaplist"):GetString() .. ".json")
+gunliststring = file.Read(GetConVar("fi_weaplist"):GetString() .. ".json")
+gunlist = util.JSONToTable(gunliststring)
 
 --were going to change the core weapon values for the server now so the weapons are correctly balanced
    for k,v in pairs(gunlist) do
@@ -401,7 +168,9 @@ temporaryweapon.Primary.Damage = temporaryweapon.Primary.Damage * (temporaryweap
 end
 
 if temporaryweaponvalues["clp"] != nil then
-temporaryweapon.Primary.DefaultClip = temporaryweapon.Primary.ClipSize * temporaryweaponvalues["clp"]
+    if temporaryweapon.Base == "tfa_gun_base" then
+    temporaryweapon.Primary.DefaultClip = temporaryweapon.Primary.ClipSize * temporaryweaponvalues["clp"]
+    end
 end
 
 if temporaryweaponvalues["sprp"] != nil then
@@ -421,6 +190,7 @@ else
 
 end
 end
+
 
 end)
 
@@ -455,7 +225,7 @@ function Playerdying(victim, attacker)
     ent:SetPos((victim:GetPos() + (victim:GetUp() * 30)))
     ent:Spawn()
     ent:Activate()
-    ent:GetPhysicsObject():SetVelocity(victim:GetVelocity() * 1.5)
+    ent:GetPhysicsObject():SetVelocity(victim:GetVelocity() * 1.2)
     ent:SetReserveClipSize(droppedweapon:GetMaxClip1())
     net.Start("addweaponhalo", false)
     net.WriteEntity(ent)
@@ -476,7 +246,6 @@ function Playerdying(victim, attacker)
     local wep = attacker:GetWeapon(attacker:GetNWString("primaryweaponname"))
     local ammotype = wep:GetPrimaryAmmoType()
     local clipsize = wep:GetMaxClip1()
-
     attacker:GiveAmmo(clipsize,ammotype,true)
     --inflictor:SetArmor (inflictor:Armor() + 1)
 else
@@ -497,13 +266,21 @@ function GM:PlayerSpawn(ply)
 
 ply:SetGravity(.80)
 ply:SetMaxHealth(100)
-ply:SetArmor(100)
-ply:SetRunSpeed(320)
-ply:SetWalkSpeed(200)
+ply:SetHealth(100)
+ply:SetArmor(0)
+ply:SetRunSpeed(350)
+ply:SetWalkSpeed(220)
 ply:SetCrouchedWalkSpeed(100)
 ply:Give(randgun, false )
-PrintMessage(HUD_PRINTTALK, randgun .. " was not found!")
 activegun = ply:GetActiveWeapon()
+
+if activegun == nil then
+PrintMessage(HUD_PRINTTALK, randgun .. " was not found!")
+end
+
+if activegun.Base == "mg_base" then
+ply:GiveAmmo(activegun:Clip1() * randguntemp["clp"], activegun:GetPrimaryAmmoType())
+end
 activegun.Attachments = randguntemp[4]
 ply:SetNWString("primaryweaponname", randgun)
     --PrintMessage(HUD_PRINTTALK, randgun)
@@ -524,10 +301,15 @@ mapselect = {
 
 hook.Add("EntityTakeDamage", "afergrth", function(entity, dmg)
 if entity:IsPlayer() == true then
+    
+  --  net.Start("updatehealth", false)
+  --  net.Write(healthremaining)
+  -- net.Send(entity)
+
     entity:SetNWInt("damagetime", CurTime())
     shieldcooldownplayer[#shieldcooldownplayer + 1] = entity
 for i=1, #shieldregenplayer do 
-if IsValid(shieldregenplayer[i]) then
+if !IsValid(shieldregenplayer[i]) then
 table.remove(shieldregenplayer, i)
 end
 end
@@ -572,10 +354,10 @@ local shieldplayer = shieldregenplayer[i]
 if shieldplayer == nil then
 return
 end
-if shieldregenplayer != nil && shieldplayer:Armor() < shieldplayer:GetMaxArmor() && shieldplayer:GetNWInt("healthtick") < CurTime() then
-shieldplayer:SetArmor(shieldplayer:Armor() + 1)
+if shieldplayer:Health() < shieldplayer:GetMaxHealth() && shieldplayer:GetNWInt("healthtick") < CurTime() then
+shieldplayer:SetHealth(shieldplayer:Health() + 1)
 shieldplayer:SetNWInt("healthtick", CurTime() + shieldtick)
-elseif shieldplayer:Armor() >= shieldplayer:GetMaxArmor() then
+elseif shieldplayer:Health() >= shieldplayer:GetMaxHealth() then
 table.remove(shieldregenplayer, i)
 end
 end
@@ -598,4 +380,240 @@ end]]
 --timer.Simple(15, game.LoadNextMap)
 end
  
+end
+
+
+
+
+
+
+
+
+
+--[[function SaveWeaponDataToJSON()
+    local TempJSONTableContainer = {}
+for k,v in pairs(gunlist) do
+
+TempJSONTableContainer[k+1] = converted
+local converted = util.TableToJSON(gunlist[k+1])
+end
+PrintTable(TempJSONTableContainer)
+file.Write("weapondata.json", util.TableToJSON(TempJSONTableContainer))
+end
+]]
+
+function SaveWeaponDataToJSON()
+    secondarygunlist = {
+        {
+        ["name"] = "mg_357", -- weapon class 
+        --AK 47 
+        --A medium damage medium range weapon useful in most situations
+        
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_charlie725", -- weapon class 
+        --AK 74u
+        --The close range variant of the AK 47
+        --useful because of its high magazine count
+        --lower damage from afar
+        
+        ["dmgp"] = 200, --damage % compared to original
+        ["clp"] = 4, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_akilo47", -- weapon class 
+        ["dmgp"] = 80, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_anovember94", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_valpha", -- weapon class 
+        ["dmgp"] = 110, --damage % compared to original
+        ["clp"] = 3, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_galima", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_falima", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_scharlie", -- weapon class 
+        ["dmgp"] = 120, --damage % compared to original
+        ["clp"] = 1, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_falpha", -- weapon class 
+        ["dmgp"] = 10, --damage % compared to original
+        ["clp"] = 3, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_sierra552", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_aalpha12", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_kilo433", -- weapon class 
+        ["dmgp"] = 900, --damage % compared to original
+        ["clp"] = 3, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_mcharlie", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_p320", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 5, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_m1911", -- weapon class 
+        ["dmgp"] = 120, --damage % compared to original
+        ["clp"] = 3,--amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_mike4", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 3, --amount of extra clips
+        ["sprp"] = 20, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_makarov", -- weapon class 
+        ["dmgp"] = 110, --damage % compared to original
+        ["clp"] = 4, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_romeo870", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_asierra12", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 3, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_oscar12", -- weapon class 
+        ["dmgp"] = 130, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_dpapa12", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 3, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_tango21", -- weapon class 
+        ["dmgp"] = 100, --damage % compared to original
+        ["clp"] = 2, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_m9", -- weapon class 
+        ["dmgp"] = 110, --damage % compared to original
+        ["clp"] = 3, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_mike26", -- weapon class 
+        ["dmgp"] = 180, --damage % compared to original
+        ["clp"] = 1, --amount of extra clips
+        ["sprp"] = 200, --spread % compared to original
+        },
+        
+        
+        {
+        ["name"] = "mg_glock", -- weapon class 
+        ["dmgp"] = 110, --damage % compared to original
+        ["clp"] = 4, --amount of extra clips
+        ["sprp"] = 100, --spread % compared to original
+        },
+        
+        
+        }
+local converted = util.TableToJSON(secondarygunlist)
+PrintTable(secondarygunlist)
+file.Write("cr_" .. "MWweaponlist" .. ".json", util.TableToJSON(secondarygunlist))
 end

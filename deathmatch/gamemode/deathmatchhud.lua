@@ -38,13 +38,13 @@ local ypos = DeathmatchScoreBoard:GetTall() * .06
 for k, v in pairs(player.GetAll()) do
 local playerpanel = vgui.Create("DPanel", DeathmatchScoreBoard)
 playerpanel:SetPos(0, ypos)
-playerpanel:SetSize(DeathmatchScoreBoard:GetWide(), DeathmatchScoreBoard:GetTall() * .05)
+playerpanel:SetSize(DeathmatchScoreBoard:GetWide(), DeathmatchScoreBoard:GetTall() * .07)
 local name = v:Name()
 if IsValid(v) then
 playerpanel.Paint = function(self, w, h)
     surface.SetDrawColor(0, 0, 0, 200)
     surface.DrawRect(0, 0, w, h)
-    draw.SimpleText(name .. " - " .. v:GetNWInt("PlayerKills"), Deathmatch_SB, w / 2, h / 2, Color( 255, 220, 50, 255 ), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+    draw.SimpleText(name .. " - " .. v:GetNWInt("PlayerKills"), Deathmatch_SB, w / 2, h * 0.5, Color( 255, 220, 50, 255 ), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 end
 end
     ypos = ypos + playerpanel:GetTall() * 1.1

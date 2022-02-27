@@ -14,16 +14,29 @@
 			"help"		"Should players have grenades?"
 			"type"		"CheckBox"
 			"default"	"1"
-		}
+			"singleplayer"  "1"
+ 		}
 
 		
 		2
 		{
 			"name"		"fi_shields"
-			"text"		"Shields"
-			"help"		"If enabled then shields are enabled"
+			"text"		"Shield regen"
+			"help"		"enables shield regen"
 			"type"		"CheckBox"
 			"default"	"1"
+			"singleplayer"  "1"
 		}
+
+		3
+		{
+			"name"		"fi_weaplist"
+			"text"		"Weapon Pack"
+			"help"		"what weaponset should the gamemode use?"
+			"type"		"Text"
+			"default"	"weapondata"
+			"singleplayer"  "1"
+		}
+	}
 	}
 }
