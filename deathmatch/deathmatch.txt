@@ -9,7 +9,7 @@
 	{
 		1
 		{
-			"name"		"fi_grenades"
+			"name"		"cr_grenades"
 			"text"		"Grenades"
 			"help"		"Should players have grenades?"
 			"type"		"CheckBox"
@@ -20,9 +20,9 @@
 		
 		2
 		{
-			"name"		"fi_shields"
-			"text"		"Shield regen"
-			"help"		"enables shield regen"
+			"name"		"cr_shields"
+			"text"		"Health Regen"
+			"help"		"enables health regen"
 			"type"		"CheckBox"
 			"default"	"1"
 			"singleplayer"  "1"
@@ -30,12 +30,21 @@
 
 		3
 		{
-			"name"		"fi_weaplist"
+			"name"		"cr_weaplist"
 			"text"		"Weapon Pack"
 			"help"		"what weaponset should the gamemode use?"
 			"type"		"Text"
-			"default"	"weapondata"
+			"default"	"cr_mw_weaponlist"
 			"singleplayer"  "1"
+		}
+		4
+		{
+			"name"		"cr_roundtime"
+			"text"		"Round Time"
+			"help"		"How long should a round last? (set to 0 for infinite round length)"
+			"type"		"Numeric"
+			"default"	"700"
+			"singleplayer"  "0"
 		}
 	}
 	}

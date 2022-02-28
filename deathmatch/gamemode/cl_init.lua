@@ -1,6 +1,8 @@
 include ("shared.lua")
 include ("deathmatchhud.lua")
 
+CreateClientConVar("cr_showhalos", "1", true, false, "Turns off the weapon highlights to improve performance!", 0, 1)
+CreateClientConVar("cr_playermodel", "models/player/police_fem.mdl", true, true)
 
 local fullhealth = {
 	[ "$pp_colour_addr" ] = 0.23,
@@ -52,7 +54,7 @@ local finalhealth = {
 	[ "$pp_colour_mulg" ] = 0,
 	[ "$pp_colour_mulb" ] = 0
 }
-
+--[[
 function GM:SpawnMenuOpen()
     return false
 end
@@ -60,7 +62,7 @@ end
 function GM:ContextMenuOpen()
     return false
 end
-
+]]
 
 hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
 
@@ -85,20 +87,20 @@ net.Receive("updatehealth", function()
 
 end)
 
-net.Receive("addweaponhalo",function()
---[[local ent = net.ReadEntity()
-if ent.IsValid then
+--[[net.Receive("addweaponhalo",function()
+local ent = net.ReadEntity()
+if IsValid(ent) then
 table.insert(droppedweapontable, ent)
 PrintMessage(HUD_PRINTTALK, ent:GetReserveAmmo() .. "is the ammo count this weapon should have")
-end]]
+end
 end)
 
 net.Receive("removeweaponhalo",function()
-   --[[local ent = net.ReadEntity()
-    table.RemoveByValue(droppedweapontable, ent)]]
+   local ent = net.ReadEntity()
+    table.RemoveByValue(droppedweapontable, ent)
     end)
 
---[[hook.Add("PreDrawHalos", "DrawFakeWeaponHalo", function()
+hook.Add("PreDrawHalos", "DrawFakeWeaponHalo", function()
 
     for i=1, #droppedweapontable do
     local temptable = {droppedweapontable[i]}

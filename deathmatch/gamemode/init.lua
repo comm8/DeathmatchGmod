@@ -20,6 +20,31 @@ util.AddNetworkString("updatehealth")
 hook.Add("Initialize", "cahjec", function()
 --this is called when the server starts
 
+concommand.Add("cr_createdroppedweapon", function(ply, cmd, ags, str)
+    local ent = ents.Create("dropped_weapon")
+    local droppedweapon = ply:GetWeapon(ply:GetNWString("primaryweaponname"))
+    droppedammotype = droppedweapon:GetPrimaryAmmoType()
+    if ply:GetAmmoCount(droppedammotype) != nil && ply:GetAmmoCount(droppedammotype) + droppedweapon:Clip1() > 0 then
+    ent:SetModel(droppedweapon:GetWeaponWorldModel())
+    ent:SetReserveAmmo(ply:GetAmmoCount(droppedammotype) + droppedweapon:Clip1())
+    ent:SetReserveAmmoType(droppedammotype)
+    ent:SetGunName(droppedweapon:GetClass())
+    ent:SetGunNum(ply:GetNWInt("GunTableNum"))
+    ent:SetPos((ply:GetPos() + (ply:GetUp() * 30)))
+    ent:Spawn()
+    ent:Activate()
+    ent:GetPhysicsObject():SetVelocity(ply:GetVelocity() * 1.2)
+    ent:SetReserveClipSize(droppedweapon:GetMaxClip1())
+    net.Start("addweaponhalo", false)
+    net.WriteEntity(ent)
+    local rf = RecipientFilter()
+    rf:AddAllPlayers()
+    net.Send(rf)
+    end
+
+end)
+
+
 concommand.Add("cr_saveweapdata", function(ply, cmd, ags, str)
 
 SaveWeaponDataToJSON()
@@ -150,8 +175,8 @@ shieldtick = 0.5
     "gm_quarantine"
                     }
 
-PrintMessage(HUD_PRINTTALK, GetConVar("fi_weaplist"):GetString() .. ".json")
-gunliststring = file.Read(GetConVar("fi_weaplist"):GetString() .. ".json")
+PrintMessage(HUD_PRINTTALK, GetConVar("cr_weaplist"):GetString() .. ".json")
+gunliststring = file.Read(GetConVar("cr_weaplist"):GetString() .. ".json")
 gunlist = util.JSONToTable(gunliststring)
 
 --were going to change the core weapon values for the server now so the weapons are correctly balanced
@@ -263,7 +288,7 @@ function GM:PlayerSpawn(ply)
     randguntemp = gunlist[randomnum]
     randgun = randguntemp["name"]
 
-
+ply:AllowFlashlight(true)
 ply:SetGravity(.80)
 ply:SetMaxHealth(100)
 ply:SetHealth(100)
@@ -289,7 +314,10 @@ ply:Give(secondaryweapon)
 ply:Give("weapon_frag")
     --PrintMessage(HUD_PRINTTALK, util.TableToJSON(activegun.Attachments))
     --PrintMessage(HUD_PRINTTALK, ply:GetNWInt("GunTableNum"))
-        local rand = math.random(#randmodel)
+      
+    
+    
+    local rand = math.random(#randmodel)
     ply:SetModel(randmodel[rand])
     ply:SetupHands()
 end
@@ -362,7 +390,8 @@ table.remove(shieldregenplayer, i)
 end
 end
 
-if CurTime() > 900 * runmapvote then
+if GetConVar("cr_roundtime"):GetInt() > 0 then
+if CurTime() > GetConVar("cr_roundtime"):GetInt() * runmapvote then
 MapVote.Start(15, true, 5, "dm")
 runmapvote = runmapvote + 1
 --[[local scoreboard = {}
@@ -379,7 +408,7 @@ end]]
 --RunConsoleCommand("map",randmap)
 --timer.Simple(15, game.LoadNextMap)
 end
- 
+end
 end
 
 
