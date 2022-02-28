@@ -54,7 +54,7 @@ local finalhealth = {
 	[ "$pp_colour_mulg" ] = 0,
 	[ "$pp_colour_mulb" ] = 0
 }
---[[
+
 function GM:SpawnMenuOpen()
     return false
 end
@@ -62,7 +62,7 @@ end
 function GM:ContextMenuOpen()
     return false
 end
-]]
+
 
 hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
 
