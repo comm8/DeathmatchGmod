@@ -1,10 +1,12 @@
+AddCSLuaFile("perlin.lua")
 include ("shared.lua")
 include ("deathmatchhud.lua")
 
-CreateClientConVar("cr_showhalos", "1", true, false, "Turns off the weapon highlights to improve performance!", 0, 1)
+CreateClientConVar("cr_maxhalos", "10", true, false, "Turns off the weapon highlights to improve performance!", 0)
 CreateClientConVar("cr_playermodel", "models/player/police_fem.mdl", true, true)
 
-local fullhealth = {
+
+--[[local fullhealth = {
 	[ "$pp_colour_addr" ] = 0.23,
 	[ "$pp_colour_addg" ] = 0.16,
 	[ "$pp_colour_addb" ] = 0.09,
@@ -14,31 +16,41 @@ local fullhealth = {
 	[ "$pp_colour_mulr" ] = 0,
 	[ "$pp_colour_mulg" ] = 0,
 	[ "$pp_colour_mulb" ] = 0
-}
+}]]
 
---[[purely to see original for development
-local lowhealth = {
-	[ "$pp_colour_addr" ] = 0.25,
+
+local fullhealth = {
+	[ "$pp_colour_addr" ] = 0.23,
 	[ "$pp_colour_addg" ] = 0.16,
 	[ "$pp_colour_addb" ] = 0.09,
-	[ "$pp_colour_brightness" ] = -0.4,
-	[ "$pp_colour_contrast" ] = 1.6,
-	[ "$pp_colour_colour" ] = 0.5,
-	[ "$pp_colour_mulr" ] = 0.7,
+	[ "$pp_colour_brightness" ] = -0.2,
+	[ "$pp_colour_contrast" ] = 1.31,
+	[ "$pp_colour_colour" ] = 0.7,
+	[ "$pp_colour_mulr" ] = 0,
 	[ "$pp_colour_mulg" ] = 0,
 	[ "$pp_colour_mulb" ] = 0
 }
-]]
 
+--[[local lowhealth2 = {
+	[ "$pp_colour_addr" ] = 0.1,
+	[ "$pp_colour_addg" ] = 0.3,
+	[ "$pp_colour_addb" ] = 0,
+	[ "$pp_colour_brightness" ] = -0.25,
+	[ "$pp_colour_contrast" ] = 1.5,
+	[ "$pp_colour_colour" ] = 0.1,
+	[ "$pp_colour_mulr" ] = 3,
+	[ "$pp_colour_mulg" ] = 0,
+	[ "$pp_colour_mulb" ] = 0
+}]]
 
 local lowhealth = {
-	[ "$pp_colour_addr" ] = 0.04,
-	[ "$pp_colour_addg" ] = 0,
-	[ "$pp_colour_addb" ] = 0,
-	[ "$pp_colour_brightness" ] = -0.2,
-	[ "$pp_colour_contrast" ] = 0.5,
-	[ "$pp_colour_colour" ] = 0,
-	[ "$pp_colour_mulr" ] = 1,
+	[ "$pp_colour_addr" ] = -0.1,
+	[ "$pp_colour_addg" ] = 0.1,
+	[ "$pp_colour_addb" ] = -0.09,
+	[ "$pp_colour_brightness" ] = -0.05,
+	[ "$pp_colour_contrast" ] = 0.19,
+	[ "$pp_colour_colour" ] = -0.6,
+	[ "$pp_colour_mulr" ] = 3,
 	[ "$pp_colour_mulg" ] = 0,
 	[ "$pp_colour_mulb" ] = 0
 }
@@ -67,11 +79,10 @@ end
 hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
 
 ply = LocalPlayer()
-localdelta = ((1 - ply:Health()/ply:GetMaxHealth()))
-	DrawBloom( 0.5, 0.7, 9, 9, 5, 2, 0.41, 0.3, 0 )
+	DrawBloom( 0.7, 3, 10, 10, 5, 1, 0.41, 0.3, 0.1 )
 
 	--DrawBloom( 0.2, 0.4, 9, 9, 5, 2, 0.2, 0.6, 1 )
-
+	localdelta = ((1 - ply:Health()/ply:GetMaxHealth()))
 	for k,v in pairs(finalhealth) do 
 	finalhealth[k] = fullhealth[k] + lowhealth[k] * localdelta
 	end

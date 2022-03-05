@@ -1,6 +1,8 @@
 AddCSLuaFile ("cl_init.lua")
 AddCSLuaFile ("shared.lua")
 AddCSLuaFile ("deathmatchhud.lua")
+--include("perlin/perlin.lua")
+--include("camerafx/camerafx.lua")
 include ("shared.lua")
 --include a bunch of files
 
@@ -20,7 +22,11 @@ util.AddNetworkString("updatehealth")
 hook.Add("Initialize", "cahjec", function()
 --this is called when the server starts
 
-concommand.Add("cr_createdroppedweapon", function(ply, cmd, ags, str)
+concommand.Add("cr_createdroppedweapon", function(ply, cmd, args, str)
+    
+    for i=1, args[1] do
+    
+    
     local ent = ents.Create("dropped_weapon")
     local droppedweapon = ply:GetWeapon(ply:GetNWString("primaryweaponname"))
     droppedammotype = droppedweapon:GetPrimaryAmmoType()
@@ -30,7 +36,7 @@ concommand.Add("cr_createdroppedweapon", function(ply, cmd, ags, str)
     ent:SetReserveAmmoType(droppedammotype)
     ent:SetGunName(droppedweapon:GetClass())
     ent:SetGunNum(ply:GetNWInt("GunTableNum"))
-    ent:SetPos((ply:GetPos() + (ply:GetUp() * 30)))
+    ent:SetPos(ply:GetPos() + (ply:GetUp() * 30) + ((Vector(i, i, 0) * 10)))
     ent:Spawn()
     ent:Activate()
     ent:GetPhysicsObject():SetVelocity(ply:GetVelocity() * 1.2)
@@ -42,7 +48,29 @@ concommand.Add("cr_createdroppedweapon", function(ply, cmd, ags, str)
     net.Send(rf)
     end
 
+end
+
 end)
+
+
+concommand.Add("cr_perlin", function(ply, cmd, args, str)
+    PerlinLoad()
+    perlinvector = {0,0,0}
+    for i=1, #args do
+    perlinvector[i] = args[i]
+    end
+    print(PerlinNoise(perlinvector[1],perlinvector[2],perlinvector[3]))
+    
+    end)
+
+
+
+concommand.Add("cr_reset", function(ply, cmd, ags, str)
+
+    CRResetMatch()
+        
+    
+    end)
 
 
 concommand.Add("cr_saveweapdata", function(ply, cmd, ags, str)
@@ -193,7 +221,7 @@ temporaryweapon.Primary.Damage = temporaryweapon.Primary.Damage * (temporaryweap
 end
 
 if temporaryweaponvalues["clp"] != nil then
-    if temporaryweapon.Base == "tfa_gun_base" then
+    if temporaryweapon.Base != "mg_base" then
     temporaryweapon.Primary.DefaultClip = temporaryweapon.Primary.ClipSize * temporaryweaponvalues["clp"]
     end
 end
@@ -220,11 +248,36 @@ end
 end)
 
 function GM:PlayerInitialSpawn(player, transition)
+    
     local rand = math.random(#randmodel)
     player:SetModel(randmodel[rand])
 end
 
 
+
+
+function CRResetMatch()
+   local allplayers = player.GetAll()
+   for i=1,#allplayers do
+    allplayers[i]:Kill()
+   end  
+
+game.CleanUpMap(false)
+
+for i=1, #banneditems do
+    local currentgroup = ents.FindByClass(banneditems[i])
+    for y=1, #currentgroup do
+    local current = currentgroup[y]
+    current:Remove()
+    end
+    --RunConsoleCommand("ent_remove_all", banneditems[i])
+    end
+
+
+
+
+
+end
 
 function GM:InitPostEntity()
     for i=1, #banneditems do
@@ -284,12 +337,14 @@ hook.Add("DoPlayerDeath", "theplayerfuccingdied", Playerdying)
 
 
 function GM:PlayerSpawn(ply)
+if GetConVar("cr_sauceify"):GetInt() == 0 then
     randomnum = math.random(#gunlist)
     randguntemp = gunlist[randomnum]
     randgun = randguntemp["name"]
 
 ply:AllowFlashlight(true)
-ply:SetGravity(.80)
+ply:SetGravity(1)
+ply:SetJumpPower(250)
 ply:SetMaxHealth(100)
 ply:SetHealth(100)
 ply:SetArmor(0)
@@ -298,6 +353,25 @@ ply:SetRunSpeed(350)
 ply:SetWalkSpeed(220)
 ply:SetCrouchedWalkSpeed(100)
 ply:Give(randgun, false )
+
+elseif GetConVar("cr_sauceify"):GetInt() == 1  then
+    
+    ply:AllowFlashlight(true)
+    ply:SetGravity(1)
+    ply:SetJumpPower(250)
+    ply:SetMaxHealth(100)
+    ply:SetHealth(100)
+    ply:SetArmor(0)
+    ply:SetMaxArmor(50)
+    ply:SetRunSpeed(350)
+    ply:SetWalkSpeed(220)
+    ply:SetCrouchedWalkSpeed(100)
+    randgun = "weapon_ar2"
+    ply:Give(randgun)
+    local activegun = ply:GetActiveWeapon()
+    ply:GiveAmmo(1000, activegun:GetPrimaryAmmoType())
+
+end
 activegun = ply:GetActiveWeapon()
 
 if activegun == nil then
@@ -313,6 +387,7 @@ ply:SetNWString("primaryweaponname", randgun)
 ply:SetNWInt("GunTableNum", randomnum)
 ply:Give(secondaryweapon)
 ply:Give("weapon_frag")
+ply:GiveAmmo(2, "Grenade")
     --PrintMessage(HUD_PRINTTALK, util.TableToJSON(activegun.Attachments))
     --PrintMessage(HUD_PRINTTALK, ply:GetNWInt("GunTableNum"))
       
@@ -367,7 +442,6 @@ local currentweaponclass = currentweapon:GetClass()
 end
 
 function GM:Think()
---playerlist = player.GetAll()
 for i=1, #shieldcooldownplayer do
 if CurTime() > shieldcooldownplayer[i]:GetNWInt("damagetime") + shielddowntime then
 local player = shieldcooldownplayer[i]
@@ -380,8 +454,9 @@ end
 end
 for i=1, #shieldregenplayer do
 local shieldplayer = shieldregenplayer[i]
-if shieldplayer == nil then
-return
+if IsValid(shieldplayer) then
+    table.RemoveByValue( shieldregenplayer, shieldplayer )
+    return
 end
 if shieldplayer:Health() < shieldplayer:GetMaxHealth() && shieldplayer:GetNWInt("healthtick") < CurTime() then
 shieldplayer:SetHealth(shieldplayer:Health() + 1)
@@ -395,19 +470,6 @@ if GetConVar("cr_roundtime"):GetInt() > 0 then
 if CurTime() > GetConVar("cr_roundtime"):GetInt() * runmapvote then
 MapVote.Start(15, true, 5, "dm")
 runmapvote = runmapvote + 1
---[[local scoreboard = {}
-local playerlists = player.GetAll()
-for i=1, #rf do
-table.insert(scoreboard,playerlists[i]:GetNWInt("PlayerKills"))
-end
-table.sort(scoreboard, function(a, b) return a[2] > b[2] end)
-end]]
---local randnum = math.random(#maplist)
- --randmap = maplist[randnum]
---net.Start("MapChange")
---net.Send(player.GetAll())
---RunConsoleCommand("map",randmap)
---timer.Simple(15, game.LoadNextMap)
 end
 end
 end

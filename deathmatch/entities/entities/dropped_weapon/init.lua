@@ -2,7 +2,8 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 
 include("shared.lua")
-
+game.AddParticles("vortigaunt_fx.pcf")
+PrecacheParticleSystem("vortigaunt_glow_charge_cp1" )
 
 function ENT:Initialize()
 self:PhysicsInit(SOLID_VPHYSICS)
@@ -20,6 +21,10 @@ self:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 end
 
 function ENT:Use(activator, caller)
+
+    activator:SetViewPunchAngles(Angle(0,0,0))
+    activator:ViewPunch(Angle(-10,0,0))
+
     local activeweapon = activator:GetWeapon(activator:GetNWString("primaryweaponname"))
     local playerweaponname = activeweapon:GetClass()
 
@@ -36,7 +41,19 @@ if activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1() == 0
     local rf = RecipientFilter()
     rf:AddAllPlayers()
     net.Send(rf)
+    ParticleEffect( "vortigaunt_hand_glow_b", self:GetPos(), Angle( 0, 0, 0 ))
     self:Remove()
+    --[[
+        
+    
+    "vortigaunt_glow_charge_cp1"
+    "vortigaunt_hand_glow_b"
+    "blood_advisor_puncture"
+    "blood_impact_red_01_smalldroplets"
+    
+    
+    
+    ]]
 end
 
 activator:RemoveAmmo(activator:GetAmmoCount(activeweapon:GetPrimaryAmmoType()), activeweapon:GetPrimaryAmmoType())
