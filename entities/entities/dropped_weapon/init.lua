@@ -30,11 +30,12 @@ function ENT:Use(activator, caller)
 
     local playerweaponammo = self:GetReserveAmmo()
     local playerammotype = self:GetReserveAmmoType()
+    local playerclipammo = self:GetReserveClipSize()
 
 self:SetReserveAmmoType(activeweapon:GetPrimaryAmmoType())
-self:SetReserveClipSize(activeweapon:GetMaxClip1())
+self:SetReserveClipSize(activeweapon:Clip1())
 
-self:SetReserveAmmo(activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1())
+self:SetReserveAmmo(activator:GetAmmoCount(self:GetReserveAmmoType()))
 if activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1() == 0 then
     net.Start("removeweaponhalo", false)
     net.WriteEntity(self)
@@ -43,17 +44,7 @@ if activator:GetAmmoCount(self:GetReserveAmmoType()) + activeweapon:Clip1() == 0
     net.Send(rf)
     ParticleEffect( "vortigaunt_hand_glow_b", self:GetPos(), Angle( 0, 0, 0 ))
     self:Remove()
-    --[[
-        
-    
-    "vortigaunt_glow_charge_cp1"
-    "vortigaunt_hand_glow_b"
-    "blood_advisor_puncture"
-    "blood_impact_red_01_smalldroplets"
-    
-    
-    
-    ]]
+
 end
 
 activator:RemoveAmmo(activator:GetAmmoCount(activeweapon:GetPrimaryAmmoType()), activeweapon:GetPrimaryAmmoType())
@@ -65,14 +56,14 @@ self:SetModel(activeweapon:GetWeaponWorldModel())
 self:PhysicsInit(SOLID_VPHYSICS)
 self:SetMoveType(MOVETYPE_VPHYSICS)
 self:SetSolid(SOLID_VPHYSICS)
-active = activator:GetActiveWeapon()
+active = activator:GetWeapon(self:GetGunName())
+active:SetClip1(playerclipammo)
 activator:SetNWString("primaryweaponname", self:GetGunName())
 
 local gunnumber = self:GetGunNum()
 self:SetGunNum(activator:GetNWInt("GunTableNum"))
 activator:SetNWInt("GunTableNum", gunnumber)
 --PrintMessage(HUD_PRINTTALK, activator:GetNWInt("GunTableNum"))
-setattachments(activator)
 
 self:SetGunName(playerweaponname)
 self:SetPos(activator:GetPos() + (activator:GetAngles():Forward() * 0) + (activator:GetAngles():Up() * 55))
